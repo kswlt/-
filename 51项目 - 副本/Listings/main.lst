@@ -1,0 +1,359 @@
+C51 COMPILER V9.54   MAIN                                                                  09/30/2024 14:05:35 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main.l
+                    -st) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Delay.h"
+   3          #include "Nixie.h"
+   4          #include "DS1302.h"
+   5          #include "LCD1602.h"
+   6          #include "Key.h"
+   7          #include "Timer0.h"
+   8          #include "Buzzer.h"
+   9          //sbit Buzzer=P1^5;
+  10          //风
+  11          //unsigned char code NixieTable[]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
+  12          //unsigned char Second,Minute;
+  13          //unsigned char time_buf[7]={0};
+  14          unsigned char KeyNum,MODE,TimeSetSelect,TimeSetFlashFlag;
+  15          unsigned int i;
+  16          unsigned char AlarmTime[7] = {24,9,28,11,34,55,6}; 
+  17          unsigned char AlarmEnabled = 0; 
+  18          unsigned char AlarmDuration = 0; 
+  19          unsigned char AlarmTriggered = 0;
+  20          void TimeShow(void)
+  21          {
+  22   1      
+  23   1            DS1302_ReadTime();//读取时间
+*** WARNING C206 IN LINE 23 OF main.c: 'DS1302_ReadTime': missing function-prototype
+  24   1            LCD_ShowNum(1,1,DS1302_Time[0],2);//显示年
+  25   1            LCD_ShowNum(1,4,DS1302_Time[1],2);//显示月
+  26   1            LCD_ShowNum(1,7,DS1302_Time[2],2);//显示日
+  27   1            LCD_ShowNum(2,1,DS1302_Time[3],2);//显示时
+  28   1            LCD_ShowNum(2,4,DS1302_Time[4],2);//显示分
+  29   1            LCD_ShowNum(2,7,DS1302_Time[5],2);//显示秒
+  30   1               
+  31   1             
+  32   1            /* if ( 
+  33   1              DS1302_Time[0] == AlarmTime[0] && 
+  34   1              DS1302_Time[1] == AlarmTime[1] && 
+  35   1              DS1302_Time[2] == AlarmTime[2] && 
+  36   1              DS1302_Time[3] == AlarmTime[3] && 
+  37   1              DS1302_Time[4] == AlarmTime[4] && 
+  38   1              DS1302_Time[5] == AlarmTime[5]) {
+  39   1              // 触发闹钟
+  40   1      
+  41   1                  //Buzzer_Time(111); // 蜂鸣器响起
+  42   1                  Delay(100);
+  43   1                  //Buzzer_Time(100); // 蜂鸣器关闭
+  44   1                  //Delay(100);
+  45   1              }
+  46   1             
+  47   1             
+  48   1             */
+  49   1        
+  50   1      }
+  51          
+  52          
+  53          
+C51 COMPILER V9.54   MAIN                                                                  09/30/2024 14:05:35 PAGE 2   
+
+  54          void TimeSet(void)
+  55          {
+  56   1      
+  57   1      //P2=0X00;
+  58   1      
+  59   1        if(KeyNum==2)
+  60   1        {
+  61   2        
+  62   2          TimeSetSelect++;
+  63   2          if(TimeSetSelect>5)TimeSetSelect=0;
+  64   2        //yue jie qing 0
+  65   2          
+  66   2        }
+  67   1        
+  68   1        
+  69   1        //LCD_ShowNum(2,10,TimeSetSelect,2);
+  70   1        
+  71   1        
+  72   1        if(KeyNum==3)
+  73   1        {
+  74   2           DS1302_Time[TimeSetSelect]++;
+  75   2        
+  76   2        
+  77   2        }
+  78   1        
+  79   1      
+  80   1        
+  81   1        if(KeyNum==4)
+  82   1        {
+  83   2           DS1302_Time[TimeSetSelect]--;
+  84   2        
+  85   2        
+  86   2        }
+  87   1        
+  88   1            LCD_ShowNum(1,1,DS1302_Time[0],2);//显示年
+  89   1            LCD_ShowNum(1,4,DS1302_Time[1],2);//显示月
+  90   1            LCD_ShowNum(1,7,DS1302_Time[2],2);//显示日
+  91   1            LCD_ShowNum(2,1,DS1302_Time[3],2);//显示时
+  92   1            LCD_ShowNum(2,4,DS1302_Time[4],2);//显示分
+  93   1            LCD_ShowNum(2,7,DS1302_Time[5],2);//显示秒
+  94   1               
+  95   1        
+  96   1      }
+  97          
+  98          
+  99          
+ 100          
+ 101          /*void SetAlarm(void) {
+ 102              if (KeyNum == 2) {
+ 103                  TimeSetSelect++;
+ 104                //  if (TimeSetSelect==6) {Buzzer_Time(3000);}
+ 105                  if (TimeSetSelect > 6) {TimeSetSelect = 0;} // 循环选择
+ 106                  //Buzzer_Time(150);
+ 107              } 
+ 108          ////  //////////////////////////3////////////////////////////////
+ 109              
+ 110              
+ 111                  else if (KeyNum == 3) {
+ 112                           if (TimeSetSelect < 6) { 
+ 113                         AlarmTime[TimeSetSelect]++;
+ 114                            Buzzer_Time(50);
+ 115                         //Buzzer_Time(111); // 提示音
+C51 COMPILER V9.54   MAIN                                                                  09/30/2024 14:05:35 PAGE 3   
+
+ 116                     } 
+ 117                           
+ 118                     
+ 119                     else if (TimeSetSelect == 6) {
+ 120                         //Buzzer_Time(3000);
+ 121                         if (AlarmDuration < 15) {
+ 122                             AlarmDuration += 5;  // 选择响铃时长
+ 123                           
+ 124                           
+ 125                           
+ 126                           
+ 127                          
+ 128                          Buzzer_Time(2000);
+ 129                          } 
+ 130                         
+ 131                          
+ 132                          
+ 133                          else {
+ 134                             AlarmDuration = 5; // 循环回到5秒
+ 135                         }
+ 136                       // Buzzer_Time(111); // 提示音
+ 137                    }
+ 138              }
+ 139          
+ 140          
+ 141          ///////////////////////////4///////////////////////////////
+ 142                        else if (KeyNum == 4) {
+ 143                          
+ 144                          
+ 145                         if (TimeSetSelect < 6) {
+ 146                          AlarmTime[TimeSetSelect]--;
+ 147                          Buzzer_Time(111); // 提示音
+ 148                       } 
+ 149                         
+ 150                          else if (TimeSetSelect == 6) {
+ 151                         
+ 152                         
+ 153                         
+ 154                           if (AlarmDuration==6) {
+ 155                              AlarmDuration -= 5; // 选择响铃时长
+ 156                         } 
+ 157                           
+ 158                            Buzzer_Time(2000);
+ 159                         else {
+ 160                             AlarmDuration = 15; // 循环回到15秒
+ 161                        }
+ 162                          Buzzer_Time(111); // 提示音
+ 163                  }
+ 164              }
+ 165          
+ 166              // 在LCD上显示设置的闹钟时间
+ 167              LCD_ShowNum(1, 1, AlarmTime[0], 2); // 显示年
+ 168              LCD_ShowNum(1, 4, AlarmTime[1], 2); // 显示月
+ 169              LCD_ShowNum(1, 7, AlarmTime[2], 2); // 显示日
+ 170              LCD_ShowNum(2, 1, AlarmTime[3], 2); // 显示时
+ 171              LCD_ShowNum(2, 4, AlarmTime[4], 2); // 显示分
+ 172              LCD_ShowNum(2, 7, AlarmTime[5], 2); // 显示秒
+ 173          
+ 174          }
+ 175          
+ 176          */
+ 177          void SetAlarm(void) {
+C51 COMPILER V9.54   MAIN                                                                  09/30/2024 14:05:35 PAGE 4   
+
+ 178   1          if (KeyNum == 2) {
+ 179   2              TimeSetSelect++;
+ 180   2             // if (TimeSetSelect == 6) { Buzzer_Time(3000); }
+ 181   2              if (TimeSetSelect > 6) { TimeSetSelect = 0; } // 循环选择
+ 182   2          } else if (KeyNum == 3) {
+ 183   2              if (TimeSetSelect < 6) {
+ 184   3                  AlarmTime[TimeSetSelect]++;
+ 185   3                  Buzzer_Time(50);
+ 186   3              } else if (TimeSetSelect == 6) {
+ 187   3                  if (AlarmDuration < 15) {
+ 188   4                      AlarmDuration += 5;  // 选择响铃时长
+ 189   4                      Buzzer_Time(2000);
+ 190   4                  } else {
+ 191   4                      AlarmDuration = 5; // 循环回到5秒
+ 192   4                  }
+ 193   3              }
+ 194   2          } else if (KeyNum == 4) {
+ 195   2              if (TimeSetSelect < 6) {
+ 196   3                  AlarmTime[TimeSetSelect]--;
+ 197   3                  Buzzer_Time(111); // 提示音
+ 198   3              } else if (TimeSetSelect == 6) {
+ 199   3                  if (AlarmDuration >= 15) {
+ 200   4                      AlarmDuration -= 5; // 选择响铃时长
+ 201   4                  } else {
+ 202   4                      AlarmDuration = 15; // 循环回到15秒
+ 203   4                  }
+ 204   3                  Buzzer_Time(2000);
+ 205   3                  Buzzer_Time(111); // 提示音
+ 206   3              }
+ 207   2          }
+ 208   1      
+ 209   1          // 在LCD上显示设置的闹钟时间
+ 210   1          LCD_ShowNum(1, 1, AlarmTime[0], 2); // 显示年
+ 211   1          LCD_ShowNum(1, 4, AlarmTime[1], 2); // 显示月
+ 212   1          LCD_ShowNum(1, 7, AlarmTime[2], 2); // 显示日
+ 213   1          LCD_ShowNum(2, 1, AlarmTime[3], 2); // 显示时
+ 214   1          LCD_ShowNum(2, 4, AlarmTime[4], 2); // 显示分
+ 215   1          LCD_ShowNum(2, 7, AlarmTime[5], 2); // 显示秒
+ 216   1      }
+ 217          
+ 218          
+ 219          
+ 220          
+ 221          
+ 222          
+ 223          void main()
+ 224          {
+ 225   1          LCD_Init();
+ 226   1          DS1302_Init();
+ 227   1          
+ 228   1          LCD_ShowString(1,1,"  -  -  ");//静态字符初始化显示
+ 229   1          LCD_ShowString(2,1,"  :  :  ");
+ 230   1          //Second=DS1302_ReadByte(0x81);
+ 231   1          //Minute=DS1302_ReadByte(0x83);
+ 232   1          //DS1302_ReadTime();
+ 233   1          DS1302_SetTime();//设置时间
+*** WARNING C206 IN LINE 233 OF main.c: 'DS1302_SetTime': missing function-prototype
+ 234   1        //Delay(5000);
+ 235   1        //while(KeyNum == 1){Buzzer_Time(1000);}
+ 236   1        
+ 237   1           while (1) {
+ 238   2              KeyNum = Key();
+C51 COMPILER V9.54   MAIN                                                                  09/30/2024 14:05:35 PAGE 5   
+
+ 239   2              if (KeyNum == 1) {
+ 240   3                  if (MODE == 0) {
+ 241   4                      MODE = 1;
+ 242   4                  } else if (MODE == 1) {
+ 243   4                      MODE = 2;
+ 244   4                  } else if (MODE == 2) {
+ 245   4                      MODE = 0;
+ 246   4                      AlarmEnabled = 1; // 退出设置模式时启用闹钟
+ 247   4                  }
+ 248   3              }
+ 249   2      
+ 250   2              switch (MODE) {
+ 251   3                  case 0:
+ 252   3                      TimeShow();
+ 253   3                      break;
+ 254   3                  case 1:
+ 255   3                      TimeSet();
+ 256   3                      break;
+ 257   3                  case 2:
+ 258   3                      SetAlarm();
+ 259   3                      break;
+ 260   3              }
+ 261   2          
+ 262   2              if (AlarmEnabled && !AlarmTriggered && 
+ 263   2                  DS1302_Time[0] == AlarmTime[0] && 
+ 264   2                  DS1302_Time[1] == AlarmTime[1] && 
+ 265   2                  DS1302_Time[2] == AlarmTime[2] && 
+ 266   2                  DS1302_Time[3] == AlarmTime[3] && 
+ 267   2                  DS1302_Time[4] == AlarmTime[4] && 
+ 268   2                  DS1302_Time[5] == AlarmTime[5]) {
+ 269   3                  // 触发闹钟
+ 270   3                  if(AlarmDuration==5){Buzzer_Time(500);} // 蜂鸣器响起}
+ 271   3                  if(AlarmDuration==10)
+ 272   3      
+ 273   3                  {Buzzer_Time(500);
+ 274   4                  Delay(100);
+ 275   4                  Buzzer_Time(500);
+ 276   4                  Delay(100); 
+ 277   4                    
+ 278   4                  }
+ 279   3                  if(AlarmDuration==15){Buzzer_Time(2000);}
+ 280   3                  /*Delay(1000);
+ 281   3                  Buzzer_Time(100);
+ 282   3                  Delay(100);
+ 283   3                  Buzzer_Time(100); // 蜂鸣器响起
+ 284   3                  Delay(100); // 蜂鸣器关闭
+ 285   3                  */
+ 286   3                  AlarmTriggered = 1; // 标记闹钟已被触发
+ 287   3                    
+ 288   3                  }
+ 289   2                  // 启动一个定时器或者使用其他方法来控制闹钟响铃的时间长度
+ 290   2              }
+ 291   1               /* if (AlarmTriggered) {
+ 292   1                  // 假设我们使用一个全局变量 i 来计数
+ 293   1                  if (i >= 60) { // 假设每秒更新一次 i
+ 294   1                      AlarmTriggered = 0; // 重置闹钟标志
+ 295   1                      i = 0; // 重置计数器
+ 296   1                  } else {
+ 297   1                      i++; // 计数
+ 298   1                  }
+ 299   1              }
+ 300   1             */
+C51 COMPILER V9.54   MAIN                                                                  09/30/2024 14:05:35 PAGE 6   
+
+ 301   1             /*DS1302_ReadTime();//DS1302读取时间，读取值为BCD码
+ 302   1                  time_buf[0]= time[DS1302_Time[3]/16];//ݫBCDëתΪʮ޸׆ìҢȒ՚˽ةא֒սהӦʮ޸׆ք׎ѡëûСʱ֚
+             -һλû
+ 303   1                time_buf[1]= time[DS1302_Time[3]&0x0f];//ݫBCDëתΪʮ޸׆ìҢȒ՚˽ةא֒սהӦʮ޸׆ք׎ѡëûСʱ�
+             -�֚׾λû
+ 304   1                time_buf[2]=0x40;//ٱʽ࠘׆-û
+ 305   1                time_buf[3]= time[DS1302_Time[4]/16];//ݫBCDëתΪʮ޸׆ìҢȒ՚˽ةא֒սהӦʮ޸׆ք׎ѡëûؖדք�
+             -�һλû
+ 306   1                time_buf[4]= time[DS1302_Time[4]&0x0f];//ݫBCDëתΪʮ޸׆ìҢȒ՚˽ةא֒սהӦʮ޸׆ք׎ѡëûؖד�
+             -�֚׾λû
+ 307   1                time_buf[5]=0x40;//ٱʽ࠘׆-û
+ 308   1                time_buf[6]= time[DS1302_Time[5]/16];//ݫBCDëתΪʮ޸׆ìҢȒ՚˽ةא֒սהӦʮ޸׆ք׎ѡëûīք֚�
+             -�λû
+ 309   1                time_buf[7]= time[DS1302_Time[5]&0x0f];
+ 310   1                Nixie(time_buf);
+ 311   1      */
+ 312   1              
+ 313   1            
+ 314   1      //Buzzer_Time(100);       
+ 315   1              
+ 316   1      }
+ 317               
+ 318             
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    652    ----
+   CONSTANT SIZE    =     18    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     16    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  2 WARNING(S),  0 ERROR(S)

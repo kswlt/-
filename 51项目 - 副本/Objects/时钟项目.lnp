@@ -1,0 +1,11 @@
+".\Objects\STARTUP.obj",
+".\Objects\main.obj",
+".\Objects\Delay.obj",
+".\Objects\Buzzer.obj",
+".\Objects\DS1302.obj",
+".\Objects\Key.obj",
+".\Objects\LCD1602.obj",
+".\Objects\Nixie.obj",
+".\Objects\Timer0.obj" 
+TO ".\Objects\时钟项目" 
+PRINT(".\Listings\时钟项目.m51") RAMSIZE(256) 
